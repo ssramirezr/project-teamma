@@ -52,19 +52,21 @@ def follow(G, nonterm, first_sets, used):
     if nonterm == 'S':  # S is the initial symbol of the grammar, and because of that, we add the $ symbol to its follow set
         follow_set.add('$')
 
-    for nt in G:
-        for production in G[nt]:
-            if nonterm in production:
-                idx = production.index(nonterm)
-                if idx + 1 < len(production):
-                    next_symbol = production[idx + 1]
-                    if next_symbol.islower():
+    for nt in G:  # We iterate over the nonterminals of the grammar
+        for production in G[nt]:  # We iterate over the productions of the nonterminal
+            if nonterm in production:   # If the nonterminal that enters as a parameter or the nonterminal that we are calculating the follow set is in the production
+                idx = production.index(nonterm)   # We get the index of the nonterminal in the production
+                if idx + 1 < len(production):    # If the nonterminal have a symbol after it in the production
+                    next_symbol = production[idx + 1]  # We get the next symbol after the nonterminal
+                    if next_symbol.islower():     # If the next symbol is a terminal, we add it to the follow set
                         follow_set.add(next_symbol)
                     else:
-                        follow_set.update(first_sets[next_symbol])
+                        follow_set.update(first_sets[next_symbol] - {'e'})  # If the next symbol is a nonterminal, we add the first set of that nonterminal to the follow set, except the epsilon 'e'
+                        if 'e' in first_sets[next_symbol]:
+                            follow_set.update(follow(G, nt, first_sets, used))  # If e is in the first set of the nonterminal, we compute the follow of that nonterminal and add it to the follow set
                 else:
                     if nt != nonterm:
-                        follow_set.update(follow(G, nt, first_sets, used))
+                        follow_set.update(follow(G, nt, first_sets, used))  # In case that there are not other letter after the nonterminal, and the current nt is different from the nonterminal that we are calculating the follow set, we compute the follow of that current nt and add it to the follow set
 
     return follow_set
 
