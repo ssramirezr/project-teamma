@@ -17,6 +17,12 @@ def input_G():
             first_sets[nonterm] = first(G, nonterm, [])   # We calculate the first set of the nonterminal and store it in the dictionary
             print("First(" + nonterm + ") = {" + ", ".join(first_sets[nonterm]) + "}")
 
+        # We calculate and show the Follow sets
+        follow_sets = {}    # We create a dictionary to store the follow sets of the nonterminals
+        for nonterm in G:    # For each nonterminal in the grammar
+            follow_sets[nonterm] = follow(G, nonterm, first_sets, [])    # We calculate the follow set of the nonterminal and store it in the dictionary
+            print("Follow(" + nonterm + ") = {" + ", ".join(follow_sets[nonterm]) + "}")
+
 
 def first(G, nonterm, used):
     first_set = set()  # we initialize the set to store the first set of the nonterminal
@@ -34,5 +40,32 @@ def first(G, nonterm, used):
 
     return first_set     # We return de set with the first set of the nonterminal
 
-input_G()
 
+def follow(G, nonterm, first_sets, used):
+    follow_set = set()   # we initialize the set to store the follow set of the nonterminal
+
+    if nonterm in used:  # If the nonterminal is mark as used, we return the follow set of that nonterminal
+        return follow_set
+    else:
+        used.append(nonterm)  # If the nonterminal is not mark as used, we add it to the list of used nonterminals
+
+    if nonterm == 'S':  # S is the initial symbol of the grammar, and because of that, we add the $ symbol to its follow set
+        follow_set.add('$')
+
+    for nt in G:
+        for production in G[nt]:
+            if nonterm in production:
+                idx = production.index(nonterm)
+                if idx + 1 < len(production):
+                    next_symbol = production[idx + 1]
+                    if next_symbol.islower():
+                        follow_set.add(next_symbol)
+                    else:
+                        follow_set.update(first_sets[next_symbol])
+                else:
+                    if nt != nonterm:
+                        follow_set.update(follow(G, nt, first_sets, used))
+
+    return follow_set
+
+input_G()
