@@ -15,13 +15,13 @@ def input_G():
         first_sets = {}     # We create a dictionary to store the first sets of the nonterminals
         for nonterm in G:   # For ech nonterminal in the grammar
             first_sets[nonterm] = first(G, nonterm, [])   # We calculate the first set of the nonterminal and store it in the dictionary
-            print("First(" + nonterm + ") = {" + ", ".join(first_sets[nonterm]) + "}")
+            print("First(" + nonterm + ") = {" + ",".join(first_sets[nonterm]) + "}")
 
         # We calculate and show the Follow sets
         follow_sets = {}    # We create a dictionary to store the follow sets of the nonterminals
         for nonterm in G:    # For each nonterminal in the grammar
             follow_sets[nonterm] = follow(G, nonterm, first_sets, [])    # We calculate the follow set of the nonterminal and store it in the dictionary
-            print("Follow(" + nonterm + ") = {" + ", ".join(follow_sets[nonterm]) + "}")
+            print("Follow(" + nonterm + ") = {" + ",".join(follow_sets[nonterm]) + "}")
 
 
 def first(G, nonterm, used):
@@ -35,7 +35,7 @@ def first(G, nonterm, used):
     for i in G[nonterm]: # We iterate over the productions of the nonterminal
         if i[0].islower():    # If the first symbol of the production is a lower case letter (terminal), we add it to the first set of the nonterminal
             first_set.add(i[0])
-        elif i == 'e'and len(i) == 1:    # If the production is only the epsilon symbol, we add the epsilon to the first set of the nonterminal
+        elif i == 'e' and len(i) == 1:    # If the production is only the epsilon symbol, we add the epsilon to the first set of the nonterminal
             first_set.add('e')
         elif len(i) > 1:        # If the production has more than one symbol, we iterate over the symbols of the production
             for j in i:
@@ -45,13 +45,12 @@ def first(G, nonterm, used):
                     if 'e' not in firsty:
                         break     # If the first symbol of the production is a nonterminal and the epsilon is not in the first set of that nonterminal, that is we found the first set of the nonterminal
                     else:
-                        if 'e' in firsty and j == i[-1]:  # If the e is in the first set of the nonterminal and the current symbol is the last symbol of the production, we add the epsilon to the first set of the nonterminal
+                        if 'e' in firsty and j == len(i)-1:  # If the e is in the first set of the nonterminal and the current symbol is the last symbol of the production, we add the epsilon to the first set of the nonterminal
                             first_set.add('e')
         else:
             first_set.update(first(G, i[0], used))
 
     return first_set     # We return de set with the first set of the nonterminal
-
 
 def follow(G, nonterm, first_sets, used):
     follow_set = set()   # we initialize the set to store the follow set of the nonterminal
