@@ -32,11 +32,23 @@ def first(G, nonterm, used):
     else:
         used.append(nonterm)   # If the nonterminal has not been used, add it to the list of used nonterminals
 
-    for i in G[nonterm]:      # We iterate in the list of productions of the nonterminal in i position
-        if i[0].islower():    # If the first symbol of the production is a terminal, we add it to the first set
+    for i in G[nonterm]: # We iterate over the productions of the nonterminal
+        if i[0].islower():    # If the first symbol of the production is a lower case letter (terminal), we add it to the first set of the nonterminal
             first_set.add(i[0])
+        elif i == 'e'and len(i) == 1:    # If the production is only the epsilon symbol, we add the epsilon to the first set of the nonterminal
+            first_set.add('e')
+        elif len(i) > 1:        # If the production has more than one symbol, we iterate over the symbols of the production
+            for j in i:
+                if j.isupper():   # If the first symbol of the production is an upper case letter (nonterminal), we calculate the first set of that nonterminal
+                    firsty = first(G, j, used)
+                    first_set.update(firsty)
+                    if 'e' not in firsty:
+                        break     # If the first symbol of the production is a nonterminal and the epsilon is not in the first set of that nonterminal, that is we found the first set of the nonterminal
+                    else:
+                        if 'e' in firsty and j == i[-1]:  # If the e is in the first set of the nonterminal and the current symbol is the last symbol of the production, we add the epsilon to the first set of the nonterminal
+                            first_set.add('e')
         else:
-            first_set.update(first(G, i[0], used))   # If the first symbol of the production is a nonterminal, we recursively calculate the first set of that nonterminal and add it to the first set
+            first_set.update(first(G, i[0], used))
 
     return first_set     # We return de set with the first set of the nonterminal
 
